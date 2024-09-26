@@ -1,3 +1,175 @@
-export * from './helpers'
-export * from './types'
-export * from './prisma-paginate'
+import { PrismaClient } from "@prisma/client";
+import { Page, PageOption, PrismaParams } from "./types/filter.type";
+import { buildWhereClause, checkSortElement } from "./helpers/filter.helper";
+
+export class PrismaClientPaginated extends PrismaClient {
+  constructor() {
+    super({
+      errorFormat: "pretty",
+    });
+  }
+
+  /**
+   * Paginates the results of a database query.
+   *
+   * @template T - The type of the items in the page.
+   * @param {string} model - The name of the model to query.
+   * @param {PageOption} pageOption - The pagination and filtering options.
+   * @param {PrismaParams} [prismaParams] - Optional ways to add prima params (where, include, select, groupBy ...) directly.
+   * @returns {Promise<Page<T>>} - A promise that resolves to a page of results.
+   * * Example:
+   * ```
+   * const pageOption: PageOption = {
+   *   page: 1,
+   *   size: 20,
+   *   sort: ['name=asc'],
+   *   filter: ['name==John', 'age>=18'],
+   *   advFilter: ['address.city==New York', 'address.state==NY'],
+   *   include: ['address'],
+   *   select: ['name', 'email'],
+   *   route: '/users',
+   * };
+   * const result = await prismaService.paginate('User', PageOption);
+   * ```
+   */
+  async paginate<T>(
+    model: string,
+    pageOption: PageOption,
+    prismaParams?: PrismaParams
+  ): Promise<Page<T>> {
+    return await paginate(this, model, pageOption, prismaParams);
+  }
+}
+
+/**
+ * Paginates the results of a database query.
+ *
+ * @template T - The type of the items in the page.
+ * @param {PrismaClient} prisma - prisma  client instance.
+ * @param {string} model - The name of the model to query.
+ * @param {PageOption} pageOption - The pagination and filtering options.
+ * @param {PrismaParams} [prismaParams] - Optional ways to add prima params (where, include, select, groupBy ...) directly.
+ * @returns {Promise<Page<T>>} - A promise that resolves to a page of results.
+ * * Example:
+ * ```
+ * const pageOption: PageOption = {
+ *   page: 1,
+ *   size: 20,
+ *   sort: ['name=asc'],
+ *   filter: ['name==John', 'age>=18'],
+ *   advFilter: ['address.city==New York', 'address.state==NY'],
+ *   include: ['address'],
+ *   select: ['name', 'email'],
+ *   route: '/users',
+ * };
+ * const result = await prismaService.paginate('User', PageOption);
+ * ```
+ */
+export async function paginate<T>(
+  prisma: PrismaClient,
+  model: string,
+  pageOption: PageOption,
+  prismaParams?: PrismaParams
+): Promise<Page<T>> {
+  const { page = 1, size = 20 } = pageOption;
+  const skip = (page - 1) * size;
+
+  const query:{
+    skip: number;
+    take: number;
+    sort: {};
+    where: {};
+    select: {};
+    include: {};
+    orderBy?: unknown;
+  } = {
+    skip,
+    take: size,
+    sort: prismaParams?.sort ?? {},
+    where: prismaParams?.where ?? {},
+    select: prismaParams?.select ?? {},
+    include: prismaParams?.include ?? {},
+  };
+
+  const resultPage: Page<T> = {
+    content: [],
+    metaData: {
+      page,
+      size,
+      totalPages: 0,
+    },
+  };
+
+  // Handle filter and nestedFilter
+  if (pageOption.filter && pageOption.filter?.length > 0) {
+    query.where = buildWhereClause(pageOption.filter);
+  }
+
+  if (pageOption.nestedFilter && pageOption.nestedFilter?.length > 0) {
+    const nestedFilter = buildWhereClause(pageOption.nestedFilter, true);
+    query.where = Object.assign(query.where, nestedFilter);
+  }
+
+  // Add the orderBy to the query if it is provided
+  let isSorted = false;
+
+  if (pageOption.sort && pageOption.sort?.length > 0) {
+    const sort = [...new Set(pageOption.sort)]?.map((sortElement) => {
+      checkSortElement(sortElement);
+
+      const [field, order] = sortElement.split("=");
+
+      return {
+        [field]: order.toLowerCase(),
+      };
+    });
+    query.orderBy = sort;
+    resultPage.metaData.sort = sort;
+    isSorted = true;
+  }
+
+  console.log("🚀 query", query);
+
+  const [data, count] = await Promise.all<[T[], number]>([
+    prisma[model].findMany(query),
+    prisma[model].count({ where: query["where"] }),
+  ]);
+
+  const totalPages = Math.ceil(count / size);
+
+  resultPage.content = data;
+
+  if (pageOption.route && !pageOption.filter && !pageOption.nestedFilter) {
+    const prev =
+      page > 1 ? `${pageOption.route}?page=${page - 1}&size=${size}` : "";
+
+    const next =
+      page < totalPages
+        ? `${pageOption.route}?page=${page + 1}&size=${size}`
+        : "";
+
+    resultPage.links = {
+      first: isSorted
+        ? `${pageOption.route}?size=${size}&sort=["${pageOption.sort}"]`
+        : `${pageOption.route}?size=${size}`,
+
+      prev:
+        isSorted && prev != ""
+          ? `${prev}&sort=["${pageOption.sort}"]`
+          : `${prev}`,
+
+      next:
+        isSorted && next != ""
+          ? `${next}&sort=["${pageOption.sort}"]`
+          : `${next}`,
+
+      last: isSorted
+        ? `${pageOption.route}?page=${totalPages}&size=${size}&sort=["${pageOption.sort}"`
+        : `${pageOption.route}?page=${totalPages}&size=${size}`,
+    };
+  }
+
+  resultPage.metaData.totalPages = totalPages;
+
+  return resultPage;
+}

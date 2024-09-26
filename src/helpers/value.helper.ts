@@ -1,10 +1,9 @@
-import { BadRequestException } from '@nestjs/common';
 import { NestedObject } from '../types/filter.type';
 
 // createdAt: { gte: fromDateNew, lte: toDateNew },
 export function transformNestedField(
   fieldParts: string[],
-  comparison,
+  comparison:  string,
   nestedLevel?: number,
 ) {
   const currentWhere: NestedObject = {};
@@ -20,7 +19,7 @@ export function transformNestedField(
   return currentWhere;
 }
 
-export function transformField(array, field: string) {
+export function transformField(array: any, field: string) {
   const combinedObject = {};
   combinedObject[field] = {};
 
@@ -68,7 +67,7 @@ export function parseFilter(filter: string): {
   const operator = extractOperator(filter);
 
   if (parts.length !== 2)
-    throw new BadRequestException(
+    throw new Error(
       `Invalid filter format: expected 'field<operator>value'. Operators available ${operators}`,
     );
 

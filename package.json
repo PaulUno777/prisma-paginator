@@ -17,6 +17,7 @@
     "pagination",
     "page",
     "paginator",
+    "prisma-paginator",
     "nestjs",
     "typescript",
     "database",

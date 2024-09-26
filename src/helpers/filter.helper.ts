@@ -69,16 +69,16 @@ function separateFilters(filters: string[]) {
   return { simpleFilters, combinedFilters };
 }
 
-export function parseCombinedFilter(combinedFilters, isAdvanced = false) {
+export function parseCombinedFilter(combinedFilters: any, isAdvanced = false) {
   let whereClause = {};
 
-  combinedFilters.forEach((combinedElement) => {
+  combinedFilters.forEach((combinedElement: any) => {
     const { nestedLevel, value } = combinedElement;
 
     let currentWhere: NestedObject = whereClause;
 
     if (isAdvanced) {
-      const combinedElementValue = value.map((filterItem) => {
+      const combinedElementValue = value.map((filterItem: any) => {
         const { field, operator, value } = parseFilter(filterItem);
 
         const fieldParts = field.split('.');
@@ -98,7 +98,7 @@ export function parseCombinedFilter(combinedFilters, isAdvanced = false) {
         return acc[key].is;
       }, currentWhere);
     } else {
-      const combinedValue = value.map((filterItem) => {
+      const combinedValue = value.map((filterItem: any) => {
         const { operator, value } = parseFilter(filterItem);
 
         const comparison = buildComparison(operator, value);
@@ -115,12 +115,12 @@ export function parseCombinedFilter(combinedFilters, isAdvanced = false) {
 }
 
 export function checkSortElement(sortElement: string) {
-  const orders = ['desc', 'asc', 'DESC', 'ASC'];
+  const orders =['desc', 'asc', 'DESC', 'ASC'];
 
   const [, order] = sortElement.split('=');
 
   if (!sortElement.includes('=') || !orders.includes(order)) {
-    throw Error(
+    throw new Error(
       `Invalid sort format: expected "field=order". Values available ${orders}`,
     );
   }
