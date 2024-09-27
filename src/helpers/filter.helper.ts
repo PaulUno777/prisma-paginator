@@ -115,11 +115,12 @@ export function parseCombinedFilter(combinedFilters: any, isAdvanced = false) {
 }
 
 export function checkSortElement(sortElement: string) {
-  const orders =['desc', 'asc', 'DESC', 'ASC'];
+  const orders = ['desc', 'asc', 'DESC', 'ASC'];
 
   const [, order] = sortElement.split('=');
+  const  isOrderValid = orders.find((value) =>  value === order);
 
-  if (!sortElement.includes('=') || !orders.includes(order)) {
+  if (!sortElement.includes('=') || !isOrderValid) {
     throw new Error(
       `Invalid sort format: expected "field=order". Values available ${orders}`,
     );

@@ -2,6 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import { Page, PageOption, PrismaParams } from "./types/filter.type";
 import { buildWhereClause, checkSortElement } from "./helpers/filter.helper";
 
+export * from "./helpers";
+export * from "./types";
+
 export class PrismaClientPaginated extends PrismaClient {
   constructor() {
     super({
@@ -74,7 +77,7 @@ export async function paginate<T>(
   const { page = 1, size = 20 } = pageOption;
   const skip = (page - 1) * size;
 
-  const query:{
+  const query: {
     skip: number;
     take: number;
     sort: {};
