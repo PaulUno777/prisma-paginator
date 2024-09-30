@@ -34,24 +34,23 @@ export class PrismaService extends PrismaClientPaginated {
   //Other methods
 }
 
-
-async function getPaginatedUsers() {
-  const prismaService = new PrismaService();
-
-  const pageOption = {
+//Can be added via the HTTP requests (body or query)
+const pageOption: PageOption = {
     page: 1,
     size: 10,
     sort: ["name=asc"],
-    filter: ["isVerified==true"]
-    route: "/users",
-  };
+    filter: ["isVerified==true", "country==FR"],
+};
 
-  const PrismaParams = {
+async function getPaginatedUsers(pageOption) {
+  const prismaService = new PrismaService();
+
+  const prismaParams: prismaParams = {
     where: { isAdmin: false }
   };
 
   //use prisma service
-  const paginatedUsers = await prismaService.paginate("user", pageOption, PrismaParams);
+  const paginatedUsers = await prismaService.paginate("user", pageOption, prismaParams);
   console.log(paginatedUsers);
 }
 
@@ -72,7 +71,7 @@ async function getPaginatedUsers() {
   const pageOption = {
     page: 1,
     size: 10,
-    sort: ["name=asc"],
+    sort: ["name=desc"],
     route: "/users",
   };
 
