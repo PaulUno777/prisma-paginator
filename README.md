@@ -18,19 +18,40 @@ The `PrismaClientPaginated` class extends `PrismaClient` and adds a `paginate` m
 
 ```ts
 import { PrismaClient } from "@prisma/client";
-import { paginate } from "prisma-paginator";
+import { PrismaClientPaginated } from "prisma-paginator";
 
-const prisma = new PrismaClient();
+//create prima service class
+export class PrismaService extends PrismaClientPaginated {
+  constructor() {
+    super();
+    this.datasources = {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    };
+  }
+
+  //Other methods
+}
+
 
 async function getPaginatedUsers() {
+  const prismaService = new PrismaService();
+
   const pageOption = {
     page: 1,
     size: 10,
     sort: ["name=asc"],
+    filter: ["isVerified==true"]
     route: "/users",
   };
 
-  const paginatedUsers = await paginate(prisma, "user", pageOption);
+  const PrismaParams = {
+    where: { isAdmin: false }
+  };
+
+  //use prisma service
+  const paginatedUsers = await prismaService.paginate(prisma, "user", pageOption, PrismaParams);
   console.log(paginatedUsers);
 }
 
