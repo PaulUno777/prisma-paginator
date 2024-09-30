@@ -26,12 +26,14 @@ export class PrismaClientPaginated extends PrismaClient {
    *   size: 20,
    *   sort: ['name=asc'],
    *   filter: ['name==John', 'age>=18'],
-   *   advFilter: ['address.city==New York', 'address.state==NY'],
-   *   include: ['address'],
-   *   select: ['name', 'email'],
+   *   nestedFilter: ['address.city==New York', 'address.state==NY'],
    *   route: '/users',
    * };
-   * const result = await prismaService.paginate('User', PageOption);
+   * const prismaParams: prismaParams = {
+   *    where: { isAdmin: false },
+   *    include:  { address: true },
+   * };
+   * const result = await prismaService.paginate('User', pageOption, prismaParams);
    * ```
    */
   async paginate<T>(
@@ -54,17 +56,20 @@ export class PrismaClientPaginated extends PrismaClient {
  * @returns {Promise<Page<T>>} - A promise that resolves to a page of results.
  * * Example:
  * ```
+ * const prisma = new PrismaClient()
  * const pageOption: PageOption = {
  *   page: 1,
  *   size: 20,
  *   sort: ['name=asc'],
  *   filter: ['name==John', 'age>=18'],
- *   advFilter: ['address.city==New York', 'address.state==NY'],
- *   include: ['address'],
- *   select: ['name', 'email'],
+ *   nestedFilter: ['address.city==New York', 'address.state==NY'],
  *   route: '/users',
  * };
- * const result = await prismaService.paginate('User', PageOption);
+ * const prismaParams: prismaParams = {
+ *    where: { isAdmin: false },
+ *    include:  { address: true },
+ * };
+ * const result = await prismaService.paginate(prisma, 'User', pageOption, prismaParams);
  * ```
  */
 export async function paginate<T>(
