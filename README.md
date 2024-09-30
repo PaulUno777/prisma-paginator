@@ -30,7 +30,6 @@ export class PrismaService extends PrismaClientPaginated {
       },
     };
   }
-
   //Other methods
 }
 
@@ -67,14 +66,15 @@ import { paginate } from "prisma-paginator";
 
 const prisma = new PrismaClient();
 
-async function getPaginatedUsers() {
-  const pageOption = {
+const pageOption: PageOption = {
     page: 1,
     size: 10,
     sort: ["name=desc"],
+    nestedFilter: ["address.city==Bolingo"],
     route: "/users",
   };
 
+async function getPaginatedUsers(pageOption) {
   const paginatedUsers = await paginate(prisma, "user", pageOption);
   console.log(paginatedUsers);
 }
@@ -117,8 +117,8 @@ getPaginatedUsers();
 interface PageOption {
   page?: number;
   size?: number;
-  filter?: any[];
-  nestedFilter?: any[];
+  filter?: string[];
+  nestedFilter?: string[];
   sort?: string[];
   route?: string;
 }
@@ -128,10 +128,10 @@ interface PageOption {
 
 ```ts
 interface PrismaParams {
-  sort?: any;
-  where?: any;
-  select?: any;
-  include?: any;
+  sort?: unknown;
+  where?: unknown;
+  select?: unknown;
+  include?: unknown;
 }
 ```
 
@@ -144,7 +144,7 @@ interface Page<T> {
     page: number;
     size: number;
     totalPages: number;
-    sort?: any[];
+    sort?: unknown[];
   };
   links?: {
     first: string;
