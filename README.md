@@ -51,7 +51,7 @@ async function getPaginatedUsers() {
   };
 
   //use prisma service
-  const paginatedUsers = await prismaService.paginate(prisma, "user", pageOption, PrismaParams);
+  const paginatedUsers = await prismaService.paginate("user", pageOption, PrismaParams);
   console.log(paginatedUsers);
 }
 
