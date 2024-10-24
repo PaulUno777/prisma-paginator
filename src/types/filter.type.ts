@@ -30,6 +30,7 @@ export interface PrismaParams {
   where?: unknown;
   include?: unknown;
   select?: unknown;
+  omit?: unknown;
 }
 
 export interface MultiNested {

@@ -23,33 +23,32 @@ import { PrismaClientPaginated } from "prisma-paginator";
 //create prima service class
 export class PrismaService extends PrismaClientPaginated {
   constructor() {
-    super();
-    this.datasources = {
-      db: {
-        url: process.env.DATABASE_URL,
-      },
-    };
+    super({ errorFormat: "pretty", datasourceUrl: "DATABASE_URL" });
   }
   //Other methods
 }
 
 //Can be added via the HTTP requests (body or query)
 const pageOption: PageOption = {
-    page: 1,
-    size: 10,
-    sort: ["name=asc"],
-    filter: ["isVerified==true", "country==FR"],
+  page: 1,
+  size: 10,
+  sort: ["name=asc"],
+  filter: ["isVerified==true", "country==FR"],
 };
 
 async function getPaginatedUsers(pageOption) {
   const prismaService = new PrismaService();
 
   const prismaParams: prismaParams = {
-    where: { isAdmin: false }
+    where: { isAdmin: false },
   };
 
   //use prisma service
-  const paginatedUsers = await prismaService.paginate("user", pageOption, prismaParams);
+  const paginatedUsers = await prismaService.paginate(
+    "user",
+    pageOption,
+    prismaParams
+  );
   console.log(paginatedUsers);
 }
 
@@ -64,15 +63,18 @@ The `paginate` function provides the same pagination functionality but can be us
 import { PrismaClient } from "@prisma/client";
 import { paginate } from "prisma-paginator";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  errorFormat: "pretty",
+  datasourceUrl: "DATABASE_URL",
+});
 
 const pageOption: PageOption = {
-    page: 1,
-    size: 10,
-    sort: ["name=desc"],
-    nestedFilter: ["address.city==Bolingo"],
-    route: "/users",
-  };
+  page: 1,
+  size: 10,
+  sort: ["name=desc"],
+  nestedFilter: ["address.city==Bolingo"],
+  route: "/users",
+};
 
 async function getPaginatedUsers(pageOption) {
   const paginatedUsers = await paginate(prisma, "user", pageOption);

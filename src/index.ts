@@ -1,14 +1,13 @@
-import { PrismaClient } from "@prisma/client";
+import {  PrismaClient } from "@prisma/client";
 import { Page, PageOption, PrismaParams } from "./types/filter.type";
 import { buildWhereClause, checkSortElement } from "./helpers/filter.helper";
+import { PrismaClientOptions } from "@prisma/client/runtime/library";
 
 export * from "./types";
 
 export class PrismaClientPaginated extends PrismaClient {
-  constructor() {
-    super({
-      errorFormat: "pretty",
-    });
+  constructor(options?: PrismaClientOptions) {
+    super(options);
   }
 
   /**
