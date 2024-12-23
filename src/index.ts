@@ -133,6 +133,11 @@ export async function paginate<T>(
     isSorted = true;
   }
 
+  if (!query?.include) delete query.include;
+  if (!query?.select) delete query.select;
+  if (!query?.where) delete query.where;
+  if (!query?.orderBy) delete query.orderBy;
+
   if (query.select) {
     delete query.include;
     console.warn(
@@ -140,7 +145,7 @@ export async function paginate<T>(
     );
   }
 
-  console.log("🚀 query", query);
+  console.log("🚀 Paginator query:", query);
 
   const [data, count] = await Promise.all<[T[], number]>([
     prisma[model].findMany(query),
