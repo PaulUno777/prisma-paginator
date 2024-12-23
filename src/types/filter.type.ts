@@ -26,11 +26,9 @@ export interface PageOption {
 }
 
 export interface PrismaParams {
-  sort?: unknown;
   where?: unknown;
   include?: unknown;
   select?: unknown;
-  omit?: unknown;
   orderBy?: unknown;
 }
 

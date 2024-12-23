@@ -83,18 +83,17 @@ export async function paginate<T>(
   const query: {
     skip: number;
     take: number;
-    sort: {};
-    where: {};
-    select: {};
-    include: {};
-    orderBy?: unknown;
+    where: any;
+    select: any;
+    include: any;
+    orderBy?: any;
   } = {
     skip,
     take: size,
-    sort: prismaParams?.sort ?? {},
-    where: prismaParams?.where ?? {},
-    select: prismaParams?.select ?? {},
-    include: prismaParams?.include ?? {},
+    orderBy: prismaParams?.orderBy ?? undefined,
+    where: prismaParams?.where ?? undefined,
+    select: prismaParams?.select ?? undefined,
+    include: prismaParams?.include ?? undefined,
   };
 
   const resultPage: Page<T> = {
@@ -113,6 +112,7 @@ export async function paginate<T>(
 
   if (pageOption.nestedFilter && pageOption.nestedFilter?.length > 0) {
     const nestedFilter = buildWhereClause(pageOption.nestedFilter, true);
+    if (!query?.where) query.where = {};
     query.where = Object.assign(query.where, nestedFilter);
   }
 
@@ -122,13 +122,12 @@ export async function paginate<T>(
   if (pageOption.sort && pageOption.sort?.length > 0) {
     const sort = [...new Set(pageOption.sort)]?.map((sortElement) => {
       checkSortElement(sortElement);
-
       const [field, order] = sortElement.split("=");
-
       return {
         [field]: order.toLowerCase(),
       };
     });
+    if (!query?.orderBy) query.orderBy = {};
     Object.assign(query.orderBy, sort);
     resultPage.metaData.sort = sort;
     isSorted = true;

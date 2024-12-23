@@ -134,7 +134,6 @@ interface PageOption {
 
 ```ts
 interface PrismaParams {
-  sort?: unknown;
   where?: unknown;
   select?: unknown;
   include?: unknown;
