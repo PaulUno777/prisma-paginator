@@ -1,4 +1,4 @@
-import {  PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Page, PageOption, PrismaParams } from "./types/filter.type";
 import { buildWhereClause, checkSortElement } from "./helpers/filter.helper";
 import { PrismaClientOptions } from "@prisma/client/runtime/library";
@@ -129,9 +129,16 @@ export async function paginate<T>(
         [field]: order.toLowerCase(),
       };
     });
-    query.orderBy = sort;
+    Object.assign(query.orderBy, sort);
     resultPage.metaData.sort = sort;
     isSorted = true;
+  }
+
+  if (query.select) {
+    delete query.include;
+    console.warn(
+      "Please either use `include` or `select`, but not both at the same time."
+    );
   }
 
   console.log("🚀 query", query);
