@@ -6,7 +6,7 @@ type MetaData = {
   page: number;
   size: number;
   totalPages: number;
-  sort?: Array<{ [key: string]: 'asc' | 'desc' | string }>;
+  sort?: Array<{ [key: string]: "asc" | "desc" | string }>;
   filter?: { [key: string]: any };
 };
 
@@ -31,6 +31,7 @@ export interface PrismaParams {
   include?: unknown;
   select?: unknown;
   omit?: unknown;
+  orderBy?: unknown;
 }
 
 export interface MultiNested {

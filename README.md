@@ -10,6 +10,10 @@ Install the module via npm:
 $ npm install prisma-paginator
 ```
 
+```bash
+$ yarn add prisma-paginator
+```
+
 ## Usage
 
 ### 1. PrismaClientPaginated Class
@@ -39,7 +43,7 @@ const pageOption: PageOption = {
 async function getPaginatedUsers(pageOption) {
   const prismaService = new PrismaService();
 
-  const prismaParams: prismaParams = {
+  const prismaParams: PrismaParams = {
     where: { isAdmin: false },
   };
 
@@ -90,9 +94,9 @@ getPaginatedUsers();
 
 #### Parameters
 
-- model (string): The name of the Prisma model to paginate.
+- model (string): The name of the Prisma model.
 - pageOption (PageOption): Options for pagination.
-- prismaParams (PrismaParams, optional): Additional Prisma query parameters.
+- prismaParams (PrismaParams, optional): Additional Prisma syntax query parameters.
 
 #### Returns
 
@@ -103,9 +107,9 @@ getPaginatedUsers();
 #### Parameters
 
 - prisma (PrismaClient): An instance of PrismaClient.
-- model (string): The name of the Prisma model to paginate.
+- model (string): The name of the Prisma model.
 - pageOption (PageOption): Options for pagination.
-- prismaParams (PrismaParams, optional): Additional Prisma query parameters.
+- prismaParams (PrismaParams, optional): Additional Prisma query syntax parameters.
 
 #### Returns
 
@@ -134,6 +138,7 @@ interface PrismaParams {
   where?: unknown;
   select?: unknown;
   include?: unknown;
+  orderBy?: unknown;
 }
 ```
 
