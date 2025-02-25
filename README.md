@@ -150,6 +150,7 @@ interface Page<T> {
     page: number;
     size: number;
     totalPages: number;
+    totalCount: number;
     sort?: unknown[];
   };
   links?: {

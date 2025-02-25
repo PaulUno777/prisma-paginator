@@ -102,6 +102,7 @@ export async function paginate<T>(
       page,
       size,
       totalPages: 0,
+      totalCount: 0,
     },
   };
 
@@ -154,6 +155,7 @@ export async function paginate<T>(
 
   const totalPages = Math.ceil(count / size);
 
+  resultPage.metaData.totalCount = count;
   resultPage.content = data;
 
   if (pageOption.route && !pageOption.filter && !pageOption.nestedFilter) {

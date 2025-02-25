@@ -6,6 +6,7 @@ type MetaData = {
   page: number;
   size: number;
   totalPages: number;
+  totalCount: number;
   sort?: Array<{ [key: string]: "asc" | "desc" | string }>;
   filter?: { [key: string]: any };
 };
