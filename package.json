@@ -1,7 +1,7 @@
 {
   "name": "prisma-paginator",
-  "version": "1.1.0",
-  "description": "A simple and flexible pagination module for Prisma, designed to be used with any Node.js project, including Express, NestJS and Next.js.",
+  "version": "1.1.1",
+  "description": "Prisma Paginator for flexible pagination module for Prisma, designed to be used with any Node.js project, including Express, NestJS, Next.js...",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
@@ -14,19 +14,23 @@
   },
   "keywords": [
     "prisma",
-    "prisma paginate",
+    "paginate",
     "paginate",
     "paginator",
     "pagination",
     "prisma-paginator",
     "prisma paginator",
     "prisma pagination",
-    "prisma-pagination"
+    "Next.js",
+    "NestJS",
+    "Express",
+    "Node.js",
+    "typescript"
   ],
   "author": "UnoTek",
   "license": "MIT",
   "peerDependencies": {
-    "@prisma/client": "^6.0.0"
+    "@prisma/client": "^6.7.0"
   },
   "devDependencies": {
     "typescript": "latest"
