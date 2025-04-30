@@ -1,76 +1,32 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { Page, PageOption, PrismaParams } from "./types/filter.type";
 import { buildWhereClause, checkSortElement } from "./helpers/filter.helper";
-import { PrismaClientOptions } from "@prisma/client/runtime/library";
 
-export * from "./types";
+export * from "./types/filter.type";
 
-export class PrismaClientPaginated extends PrismaClient {
-  constructor(options?: PrismaClientOptions) {
-    super(options);
-  }
-
-  /**
-   * Paginates the results of a database query.
-   *
-   * @template T - The type of the items in the page.
-   * @param {string} model - The name of the model to query.
-   * @param {PageOption} pageOption - The pagination and filtering options.
-   * @param {PrismaParams} [prismaParams] - Optional ways to add prima params (where, include, select, groupBy ...) directly.
-   * @returns {Promise<Page<T>>} - A promise that resolves to a page of results.
-   * * Example:
-   * ```
-   * const pageOption: PageOption = {
-   *   page: 1,
-   *   size: 20,
-   *   sort: ['name=asc'],
-   *   filter: ['name==John', 'age>=18'],
-   *   nestedFilter: ['address.city==New York', 'address.state==NY'],
-   *   route: '/users',
-   * };
-   * const prismaParams: prismaParams = {
-   *    where: { isAdmin: false },
-   *    include:  { address: true },
-   * };
-   * const result = await prismaService.paginate('User', pageOption, prismaParams);
-   * ```
-   */
-  async paginate<T>(
+/**
+ * Returns a paginator function bound to a specific Prisma client.
+ */
+export function getPaginatorFunc(prisma: PrismaClient) {
+  return function paginateWithClient<T>(
     model: string,
     pageOption: PageOption,
     prismaParams?: PrismaParams
   ): Promise<Page<T>> {
-    return await paginate(this, model, pageOption, prismaParams);
-  }
+    return paginate<T>(prisma, model, pageOption, prismaParams);
+  };
 }
 
 /**
  * Paginates the results of a database query.
- *
- * @template T - The type of the items in the page.
- * @param {PrismaClient} prisma - prisma  client instance.
+ * @param {PrismaClient} prisma - The Prisma client instance.
  * @param {string} model - The name of the model to query.
  * @param {PageOption} pageOption - The pagination and filtering options.
- * @param {PrismaParams} [prismaParams] - Optional ways to add prima params (where, include, select, groupBy ...) directly.
+ * @param {PrismaParams} [prismaParams] - Optional Prisma parameters (where, include, select, groupBy).
  * @returns {Promise<Page<T>>} - A promise that resolves to a page of results.
- * * Example:
- * ```
- * const prisma = new PrismaClient()
- * const pageOption: PageOption = {
- *   page: 1,
- *   size: 20,
- *   sort: ['name=asc'],
- *   filter: ['name==John', 'age>=18'],
- *   nestedFilter: ['address.city==New York', 'address.state==NY'],
- *   route: '/users',
- * };
- * const prismaParams: prismaParams = {
- *    where: { isAdmin: false },
- *    include:  { address: true },
- * };
- * const result = await prismaService.paginate(prisma, 'User', pageOption, prismaParams);
- * ```
- */
+ * @template T - The type of the items in the page.
+ * @throws {Error} - Throws an error if the model is not found or if the query fails.
+ **/
 export async function paginate<T>(
   prisma: PrismaClient,
   model: string,

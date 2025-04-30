@@ -1,10 +1,10 @@
 # Prisma Paginator
 
-`prisma-paginator` A simple and flexible pagination module for Prisma, designed to be used with any Node.js project, including NestJS and Next.js. It provides two methods for paginating Prisma queries: one as a method in a class that extends `PrismaClientPaginated`, and another as a standalone paginate function.
+`prisma-paginator` is a lightweight and flexible pagination utility for Prisma. It enables clean pagination logic with filtering, sorting, and navigation links, and is ideal for integration into custom `PrismaService` classes—without extending any base class.
 
-## Installation
+## 🚀 Installation
 
-Install the module via npm:
+Install the module via npm yarn or pnpm:
 
 ```bash
 $ npm install prisma-paginator
@@ -14,24 +14,41 @@ $ npm install prisma-paginator
 $ yarn add prisma-paginator
 ```
 
-## Usage
+```bash
+$ pnpm add prisma-paginator
+```
 
-### 1. PrismaClientPaginated Class
+## 📦 Usage
 
-The `PrismaClientPaginated` class extends `PrismaClient` and adds a `paginate` method. This method can be used to paginate queries on any Prisma model.
+### 1. Add `paginate` method to your PrismaService Class
+
+Use `getPaginatorFunc` to bind pagination logic to your Prisma service class:
 
 ```ts
 import { PrismaClient } from "@prisma/client";
-import { PrismaClientPaginated } from "prisma-paginator";
+import { getPaginatorFunc } from "prisma-paginator";
 
 //create prima service class
-export class PrismaService extends PrismaClientPaginated {
+export class PrismaService extends PrismaClient {
   constructor() {
     super({ errorFormat: "pretty", datasourceUrl: "DATABASE_URL" });
   }
-  //Other methods
-}
+  paginate<T>(
+    model: string,
+    pageOption: PageOption,
+    prismaParams?: PrismaParams
+  ) {
+    const paginateWithClient = getPaginatorFunc(this);
+    return paginateWithClient<T>(model, pageOption, prismaParams);
+  }
 
+  // Add your custom methods below...
+}
+```
+
+### Example Usage
+
+```ts
 //Can be added via the HTTP requests (body or query)
 const pageOption: PageOption = {
   page: 1,
@@ -40,14 +57,13 @@ const pageOption: PageOption = {
   filter: ["isVerified==true", "country==FR"],
 };
 
-async function getPaginatedUsers(pageOption) {
-  const prismaService = new PrismaService();
+const prismaService = new PrismaService();
 
+async function getPaginatedUsers(pageOption) {
   const prismaParams: PrismaParams = {
     where: { isAdmin: false },
   };
 
-  //use prisma service
   const paginatedUsers = await prismaService.paginate(
     "user",
     pageOption,
@@ -59,9 +75,9 @@ async function getPaginatedUsers(pageOption) {
 getPaginatedUsers();
 ```
 
-### 2. paginate Function
+### 2. `paginate` Function
 
-The `paginate` function provides the same pagination functionality but can be used independently of the `PrismaClientPaginated` class. It requires a `PrismaClient` instance as the first parameter.
+The standalone `paginate` function can be used independently and directly with a `PrismaClient` instance.
 
 ```ts
 import { PrismaClient } from "@prisma/client";
@@ -88,9 +104,9 @@ async function getPaginatedUsers(pageOption) {
 getPaginatedUsers();
 ```
 
-## API
+## 🧪 API
 
-### PrismaClientPaginated.paginate
+### PrismaService.paginate method
 
 #### Parameters
 
@@ -102,7 +118,7 @@ getPaginatedUsers();
 
 - Promise<Page<T>>: A promise that resolves to a paginated result.
 
-### paginate
+### paginate function
 
 #### Parameters
 
@@ -115,10 +131,9 @@ getPaginatedUsers();
 
 - Promise<Page<T>>: A promise that resolves to a paginated result.
 
-## Types
+## 📘 Types
 
 ### PageOption
-
 ```ts
 interface PageOption {
   page?: number;
@@ -131,7 +146,6 @@ interface PageOption {
 ```
 
 ### PrismaParams
-
 ```ts
 interface PrismaParams {
   where?: unknown;
@@ -142,7 +156,6 @@ interface PrismaParams {
 ```
 
 ### Page
-
 ```ts
 interface Page<T> {
   content: T[];
@@ -162,6 +175,5 @@ interface Page<T> {
 }
 ```
 
-## License
-
+## 📝 License
 This project is licensed under the MIT License.
