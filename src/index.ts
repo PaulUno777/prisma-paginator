@@ -62,6 +62,8 @@ export async function paginate<T>(
     },
   };
 
+  pageOption = cleanPageOption(pageOption);
+
   // Handle filter and nestedFilter
   if (pageOption.filter && pageOption.filter?.length > 0) {
     query.where = buildWhereClause(pageOption.filter);
@@ -147,4 +149,31 @@ export async function paginate<T>(
   resultPage.metaData.totalPages = totalPages;
 
   return resultPage;
+}
+
+export function cleanPageOption(option: PageOption): PageOption {
+  const cleaned: PageOption = {};
+
+  // Only assign fields if they are not null/undefined
+  if (option?.page) cleaned.page = option.page;
+  if (option?.size) cleaned.size = option.size;
+  if (option?.route) cleaned.route = option.route;
+
+  // Clean arrays by removing null/undefined items
+  if (Array.isArray(option.sort)) {
+    const cleanedSort = option.sort.filter((v): v is string => v != null);
+    if (cleanedSort.length) cleaned.sort = cleanedSort;
+  }
+
+  if (Array.isArray(option.filter)) {
+    const cleanedFilter = option.filter.filter((v): v is string => v != null);
+    if (cleanedFilter.length) cleaned.filter = cleanedFilter;
+  }
+
+  if (Array.isArray(option.nestedFilter)) {
+    const cleanedNested = option.nestedFilter.filter((v): v is string => v != null);
+    if (cleanedNested.length) cleaned.nestedFilter = cleanedNested;
+  }
+
+  return cleaned;
 }
